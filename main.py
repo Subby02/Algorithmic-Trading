@@ -102,12 +102,12 @@ def update():
     if is_long():
       place_long(
         prices[-1][4], unit, math.floor(ema50[198], 1),
-        prices[-1][4] + math.floor((prices[-1][4] - ema50[198]) * 1.015, 1))
+        prices[-1][4] + math.floor((prices[-1][4] - ema50[198]) * PL, 1))
       print('long:', prices[-1][4], unit)
     elif is_short():
       place_short(
         prices[-1][4], unit, math.floor(ema50[198], 1),
-        prices[-1][4] + math.floor((prices[-1][4] - ema50[198]) * 1.015, 1))
+        prices[-1][4] + math.floor((prices[-1][4] - ema50[198]) * PL, 1))
       print('short:', prices[-1][4], unit)
 
 
