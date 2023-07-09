@@ -118,9 +118,9 @@ def update_price(interval, limit):
 def update_ema():
   global ema25, ema50, ema100
   df = pd.DataFrame(prices)
-  ema25 = df[4].ewm(25).mean()
-  ema50 = df[4].ewm(50).mean()
-  ema100 = df[4].ewm(100).mean()
+  ema25 = df[4].ewm(span=25).mean()
+  ema50 = df[4].ewm(span=50).mean()
+  ema100 = df[4].ewm(span=100).mean()
 
 
 def is_regula():
