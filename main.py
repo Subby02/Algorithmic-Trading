@@ -5,21 +5,6 @@ import time
 import datetime
 import math
 
-# 1. 기본적인 API 연동
-# 2. EMA 구현 O
-
-# 매매법
-# 25ema > 50ema > 100ema == 정배열
-# 25ema < 50ema < 100ema == 역배열
-
-# 정배열 and 캔들이 25ema 위 == 상승 추세
-# 역배열 and 캔들이 25ema 아래 = 하락 추세
-
-# 상승 추세 일때 캔들이 25ema와 50ema 사이에 들어오고 다시 25ema까지 올라면 종가에서 롱포지션 진입
-# 하락 추세 일때 캔들이 25ema와 50ema 사이에 들어오고 다시 25ema아래로 내려가면 종가에서 숏포지션 진입
-
-# 포지션 진입시 50ema에 스탑로스를 걸고 스탑로스 1.5배 만큼 익절라인을 지정
-
 session = HTTP(
   testnet=False,
   api_key="",
@@ -31,11 +16,16 @@ ema25 = None
 ema50 = None
 ema100 = None
 
-min_gap = 1
+min_gap = 0.05
 PL = 1.5
 fee = 0.048
 leverage = 10
-unit = 0.02
+unit = 0.025
+
+
+def floor(x, z):
+  z = 10**z
+  return math.floor(x * z) / z
 
 
 def set_leverage(leverage):
@@ -62,10 +52,10 @@ def is_no_position():
 
 def place_long(price, qty, stoploss, takeprofit):
   session.place_order(
-    category="linear",  #선물
+    category="linear", 
     symbol="BTCUSDT",
     side="Buy",
-    orderType="Market",  #지정가
+    orderType="Market",  
     qty=str(qty),
     price=str(price),
     stopLoss=str(stoploss),
@@ -75,10 +65,10 @@ def place_long(price, qty, stoploss, takeprofit):
 
 def place_short(price, qty, stoploss, takeprofit):
   session.place_order(
-    category="linear",  #선물
+    category="linear",  
     symbol="BTCUSDT",
     side="Sell",
-    orderType="Market",  #지정가
+    orderType="Market",  
     qty=str(qty),
     price=str(price),
     stopLoss=str(stoploss),
@@ -91,23 +81,25 @@ def update():
   update_ema()
   print(datetime.datetime.now())
   print('price :', prices[-1][4])
-  print('ema25 :', ema25[198])
-  print('ema50 :', ema50[198])
-  print('ema100 :', ema100[198])
+  print('ema25 :', floor(ema25[198],1))
+  print('ema50 :', floor(ema50[198],1))
+  print('ema100 :', floor(ema100[198],1))
   print('regular :', is_regula())
   print('invert :', is_invert())
-  print('25,50 gap :', gap_25_50())
-  print('100,50 gap :', gap_50_100())
+  print('25,50 gap :', floor(gap_25_50(),3))
+  print('100,50 gap :', floor(gap_50_100(),3))
   if is_no_position():
     if is_long():
-      place_long(
-        prices[-1][4], unit, math.floor(ema50[198], 1),
-        prices[-1][4] + math.floor((prices[-1][4] - ema50[198]) * PL, 1))
+      place_long(prices[-1][4],
+                 unit, 
+                 floor(ema50[198], 1),
+                 prices[-1][4] + floor((prices[-1][4] - ema50[198]) * PL, 1))
       print('long:', prices[-1][4], unit)
     elif is_short():
-      place_short(
-        prices[-1][4], unit, math.floor(ema50[198], 1),
-        prices[-1][4] + math.floor((prices[-1][4] - ema50[198]) * PL, 1))
+      place_short(prices[-1][4], 
+                  unit, 
+                  floor(ema50[198], 1),
+                  prices[-1][4] + floor((prices[-1][4] - ema50[198]) * PL, 1))
       print('short:', prices[-1][4], unit)
 
 
@@ -155,16 +147,18 @@ def gap_50_100():
 
 def is_long():
   if is_regula():
-    if ema25[198] < float(prices[-1][4]) and ema25[197] > float(prices[-2][4]):
-      if gap_25_50() >= min_gap and gap_50_100() >= min_gap:
+    if gap_25_50() >= min_gap and gap_50_100() >= min_gap:
+      if ema25[198] < float(prices[-1][4]) and ema25[197] > float(
+          prices[-2][4]):
         return True
   return False
 
 
 def is_short():
   if is_invert():
-    if ema25[198] > float(prices[-1][4]) and ema25[197] < float(prices[-2][4]):
-      if gap_25_50() >= min_gap and gap_50_100() >= min_gap:
+    if gap_25_50() >= min_gap and gap_50_100() >= min_gap:
+      if ema25[198] > float(prices[-1][4]) and ema25[197] < float(
+          prices[-2][4]):
         return True
   return False
 
