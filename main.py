@@ -52,10 +52,10 @@ def is_no_position():
 
 def place_long(price, qty, stoploss, takeprofit):
   session.place_order(
-    category="linear", 
+    category="linear",
     symbol="BTCUSDT",
     side="Buy",
-    orderType="Market",  
+    orderType="Market",
     qty=str(qty),
     price=str(price),
     stopLoss=str(stoploss),
@@ -65,10 +65,10 @@ def place_long(price, qty, stoploss, takeprofit):
 
 def place_short(price, qty, stoploss, takeprofit):
   session.place_order(
-    category="linear",  
+    category="linear",
     symbol="BTCUSDT",
     side="Sell",
-    orderType="Market",  
+    orderType="Market",
     qty=str(qty),
     price=str(price),
     stopLoss=str(stoploss),
@@ -81,25 +81,23 @@ def update():
   update_ema()
   print(datetime.datetime.now())
   print('price :', prices[-1][4])
-  print('ema25 :', floor(ema25[198],1))
-  print('ema50 :', floor(ema50[198],1))
-  print('ema100 :', floor(ema100[198],1))
+  print('ema25 :', floor(ema25[198], 1))
+  print('ema50 :', floor(ema50[198], 1))
+  print('ema100 :', floor(ema100[198], 1))
   print('regular :', is_regula())
   print('invert :', is_invert())
-  print('25,50 gap :', floor(gap_25_50(),3))
-  print('100,50 gap :', floor(gap_50_100(),3))
+  print('25,50 gap :', floor(gap_25_50(), 3))
+  print('100,50 gap :', floor(gap_50_100(), 3))
   if is_no_position():
     if is_long():
-      place_long(prices[-1][4],
-                 unit, 
-                 floor(ema50[198], 1),
-                 prices[-1][4] + floor((prices[-1][4] - ema50[198]) * PL, 1))
+      place_long(
+        prices[-1][4], unit, floor(ema50[198], 1), prices[-1][4] + floor(
+          (float(prices[-1][4]) - ema50[198]) * PL, 1))
       print('long:', prices[-1][4], unit)
     elif is_short():
-      place_short(prices[-1][4], 
-                  unit, 
-                  floor(ema50[198], 1),
-                  prices[-1][4] + floor((prices[-1][4] - ema50[198]) * PL, 1))
+      place_short(
+        prices[-1][4], unit, floor(ema50[198], 1), prices[-1][4] + floor(
+          (float(prices[-1][4]) - ema50[198]) * PL, 1))
       print('short:', prices[-1][4], unit)
 
 
@@ -112,15 +110,15 @@ def update_price(interval, limit):
   )
 
   global prices
-  prices = list(reversed(result['result']['list'][1:]))
+  prices = list(reversed(result['result']['list']))
 
 
 def update_ema():
   global ema25, ema50, ema100
   df = pd.DataFrame(prices)
-  ema25 = df[4].ewm(span=25).mean()
-  ema50 = df[4].ewm(span=50).mean()
-  ema100 = df[4].ewm(span=100).mean()
+  ema25 = df[4].ewm(span=25).mean().to_list()
+  ema50 = df[4].ewm(span=50).mean().to_list()
+  ema100 = df[4].ewm(span=100).mean().to_list()
 
 
 def is_regula():
