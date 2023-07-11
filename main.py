@@ -16,7 +16,7 @@ ema25 = None
 ema50 = None
 ema100 = None
 
-min_gap = 0.05
+min_gap = 0.07
 PL = 1.5
 fee = 0.048
 leverage = 10
@@ -111,6 +111,7 @@ def update_price(interval, limit):
 
   global prices
   prices = list(reversed(result['result']['list']))
+  print(prices)
 
 
 def update_ema():
@@ -146,8 +147,7 @@ def gap_50_100():
 def is_long():
   if is_regula():
     if gap_25_50() >= min_gap and gap_50_100() >= min_gap:
-      if ema25[198] < float(prices[-1][4]) and ema25[197] > float(
-          prices[-2][4]):
+      if float(prices[-1][1]) < floor(ema25[198], 1) < float(prices[-1][4]):
         return True
   return False
 
@@ -155,8 +155,7 @@ def is_long():
 def is_short():
   if is_invert():
     if gap_25_50() >= min_gap and gap_50_100() >= min_gap:
-      if ema25[198] > float(prices[-1][4]) and ema25[197] < float(
-          prices[-2][4]):
+      if float(prices[-1][1]) < floor(ema25[198], 1) < float(prices[-1][4]):
         return True
   return False
 
