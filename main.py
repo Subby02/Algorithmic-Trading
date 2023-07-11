@@ -91,12 +91,12 @@ def update():
   if is_no_position():
     if is_long():
       place_long(
-        prices[-1][4], unit, floor(ema50[198], 1), prices[-1][4] + floor(
+        float(prices[-1][4]), unit, floor(ema50[198], 1), float(prices[-1][4]) + floor(
           (float(prices[-1][4]) - ema50[198]) * PL, 1))
       print('long:', prices[-1][4], unit)
     elif is_short():
       place_short(
-        prices[-1][4], unit, floor(ema50[198], 1), prices[-1][4] + floor(
+        float(prices[-1][4]), unit, floor(ema50[198], 1), float(prices[-1][4]) + floor(
           (float(prices[-1][4]) - ema50[198]) * PL, 1))
       print('short:', prices[-1][4], unit)
 
@@ -110,8 +110,7 @@ def update_price(interval, limit):
   )
 
   global prices
-  prices = list(reversed(result['result']['list']))
-  print(prices)
+  prices = list(reversed(result['result']['list'][1:]))
 
 
 def update_ema():
