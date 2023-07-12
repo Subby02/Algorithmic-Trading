@@ -91,13 +91,15 @@ def update():
   if is_no_position():
     if is_long():
       place_long(
-        float(prices[-1][4]), unit, floor(ema50[198], 1), float(prices[-1][4]) + floor(
-          (float(prices[-1][4]) - ema50[198]) * PL, 1))
+        float(prices[-1][4]), unit, floor(ema50[198], 1),
+        floor(
+          float(prices[-1][4]) + (float(prices[-1][4]) - ema50[198]) * PL, 1))
       print('long:', prices[-1][4], unit)
     elif is_short():
       place_short(
-        float(prices[-1][4]), unit, floor(ema50[198], 1), float(prices[-1][4]) + floor(
-          (float(prices[-1][4]) - ema50[198]) * PL, 1))
+        float(prices[-1][4]), unit, floor(ema50[198], 1),
+        floor(
+          float(prices[-1][4]) + (float(prices[-1][4]) - ema50[198]) * PL, 1))
       print('short:', prices[-1][4], unit)
 
 
