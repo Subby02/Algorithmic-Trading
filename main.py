@@ -20,12 +20,26 @@ min_gap = 0.07
 PL = 1.5
 fee = 0.048
 leverage = 10
-unit = 0.025
 
 
 def floor(x, z):
   z = 10**z
   return math.floor(x * z) / z
+
+
+def get_balance():
+  result = session.get_wallet_balance(
+    accountType="CONTRACT",
+    coin="USDT",
+  )
+
+  return float(result['result']['list'][0]['coin'][0]['walletBalance'])
+
+
+def get_max_qty():
+  balance = get_balance()
+
+  return floor(balance / float(prices[-1][4]) * 10 , 3)
 
 
 def set_leverage(leverage):
@@ -43,8 +57,7 @@ def is_no_position():
     symbol="BTCUSDT",
   )
 
-  if float(result['result']['list'][0]['size']) == 0 and float(
-      result['result']['list'][1]['size']) == 0:
+  if float(result['result']['list'][0]['size']) == 0:
     return True
 
   return False
@@ -89,6 +102,7 @@ def update():
   print('25,50 gap :', floor(gap_25_50(), 3))
   print('100,50 gap :', floor(gap_50_100(), 3))
   if is_no_position():
+    unit = get_max_qty()
     if is_long():
       place_long(
         float(prices[-1][4]), unit, floor(ema50[198], 1),
