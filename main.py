@@ -39,7 +39,7 @@ def get_balance():
 def get_max_qty():
   balance = get_balance()
 
-  return floor(balance / float(prices[-1][4]) * 10 , 3)
+  return floor(balance / float(prices[-1][4]) * 10 * 0.95, 3)
 
 
 def set_leverage(leverage):
@@ -170,7 +170,7 @@ def is_long():
 def is_short():
   if is_invert():
     if gap_25_50() >= min_gap and gap_50_100() >= min_gap:
-      if float(prices[-1][1]) < floor(ema25[198], 1) < float(prices[-1][4]):
+      if float(prices[-1][1]) > floor(ema25[198], 1) > float(prices[-1][4]):
         return True
   return False
 
